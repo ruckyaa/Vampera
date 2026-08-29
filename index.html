@@ -1,36 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampera</title>
+    <title>VampEra - Full App</title>
+    
+    <!-- خط الآيفون SF Pro وأيقونات FontAwesome -->
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/sf-pro-display">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- ملف الـ PWA لتثبيت التطبيق -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon.png">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-main: #12151e;
+            --bg-card: #1a1e29;
+            --bg-element: #222736;
+            --accent-red: #8b0000;
+            --accent-hover: #a00000;
+            --text-white: #ffffff;
+            --text-sub: #a0a5b5;
+            --border-color: #2e3446;
+            --font-ios: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        body {
-            background: #000;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-ios); }
+        body { background-color: var(--bg-main); color: var(--text-white); height: 100vh; display: flex; overflow: hidden; }
 
-        h1 {
-            font-size: 70px;
-            letter-spacing: 12px;
-            font-weight: 300;
-        }
+        /* Sidebar Navigation */
+        .sidebar { width: 250px; background-color: var(--bg-card); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 10px; }
+        .logo { font-size: 26px; font-weight: bold; color: var(--accent-red); text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+        .nav-item { padding: 12px 15px; border-radius: 10px; color: var(--text-sub); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.3s; }
+        .nav-item:hover, .nav-item.active { background-color: var(--accent-red); color: var(--text-white); }
+
+        /* Center Main Feed */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; border-left: 1px solid var(--border-color); }
+        .header-bar { padding: 15px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+
+        /* Stories & Notes */
+        .stories-container { display: flex; gap: 12px; padding: 15px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); overflow-x: auto; }
+        .story-card { min-width: 85px; height: 110px; border-radius: 12px; background-color: var(--bg-element); border: 2px solid var(--accent-red); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; text-align: center; }
+
+        /* Feed & Create Post */
+        .feed-section { padding: 20px; max-width: 650px; margin: 0 auto; width: 100%; }
+        .create-post { background-color: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+        .create-post textarea { width: 100%; background: transparent; border: none; color: var(--text-white); resize: none; outline: none; font-size: 14px; margin-bottom: 10px; }
+        .post-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px; }
+
+        /* Right Panel: Chat & Mini Games & Call Overlay */
+        .right-panel { width: 380px; background-color: var(--bg-card); display: flex; flex-direction: column; }
+        .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 13px; position: relative; }
+        .message.sent { background-color: var(--accent-red); align-self: flex-start; }
+        .message.received { background-color: var(--bg-element); align-self: flex-end; }
+        .chat-input-bar { padding: 10px; background-color: var(--bg-element); display: flex; align-items: center; gap: 10px; }
+        .chat-input-bar input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-white); }
+
+        /* Modals (Settings / Games / Drawing) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-content { background: var(--bg-card); padding: 25px; border-radius: 15px; width: 450px; border: 1px solid var(--border-color); }
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+
+        /* Tic-Tac-Toe Game Grid */
+        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 240px; margin: 15px auto; }
+        .ttt-cell { width: 70px; height: 70px; background: var(--bg-element); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; cursor: pointer; border-radius: 8px; }
+
+        /* Custom Toggle Switch */
+        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 22px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-red); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .btn-btn { background-color: var(--accent-red); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
-
 <body>
-    <h1>VAMPERA</h1>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">VampEra</div>
+        <ul class="nav-menu">
+            <li class="nav-item active"><i class="fa-solid fa-house"></i> الرئيسية</li>
+            <li class="nav-item"><i class="fa-solid fa-comments"></i> الدردشة</li>
+            <li class="nav-item" onclick="openModal('gameModal')"><i class="fa-solid fa-gamepad"></i> الألعاب (X-O)</li>
+            <li class="nav-item" onclick="openModal('drawModal')"><i class="fa-solid fa-paint-brush"></i> الرسم التفاعلي</li>
+            <li class="nav-item" onclick="openModal('settingsModal')"><i class="fa-solid fa-gear"></i> إعدادات الخصوصية</li>
+        </ul>
+    </div>
+
+    <!-- Main Feed Content -->
+    <div class="main-content">
+        <div class="header-bar">
+            <h2>المنشورات والقصص</h2>
+            <i class="fa-solid fa-bell" style="cursor:pointer;"></i>
+        </div>
+
+        <!-- Stories & Notes -->
+        <div class="stories-container">
+            <div class="story-card">+ قصة جديدة</div>
+            <div class="story-card">قصة صديق</div>
+            <div class="story-card">ملاحظة سريعة</div>
+        </div>
+
+        <!-- Posts Feed -->
+        <div class="feed-section">
+            <div class="create-post">
+                <textarea placeholder="شاركونا أفكاركم، صوركم، أو ملاحظاتكم اليوم..."></textarea>
+                <div class="post-actions">
+                    <div>
+                        <i class="fa-solid fa-image" style="cursor:pointer; margin-left: 10px;"></i>
+                        <i class="fa-solid fa-video" style="cursor:pointer; margin-left: 10px;"></i>
+                        <i class="fa-solid fa-music" style="cursor:pointer; margin-left: 10px;"></i>
+                    </div>
+                    <button class="btn-btn">نشر المنشور</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel (Chat & Calls) -->
+    <div class="right-panel">
+        <div class="header-bar">
+            <span>غرفة الدردشة العادية</span>
+            <div>
+                <i class="fa-solid fa-phone" style="margin-left: 10px; cursor: pointer;" title="مكالمة صوتية"></i>
+                <i class="fa-solid fa-desktop" style="cursor: pointer;" title="مشاركة الشاشة"></i>
+            </div>
+        </div>
+
+        <div class="chat-box">
+            <div class="message received">أهلاً بك في منصة VampEra المتكاملة!</div>
+            <div class="message sent">مرحباً! الرسائل والخصوصية شغالة ممتاز.</div>
+        </div>
+
+        <div class="chat-input-bar">
+            <i class="fa-solid fa-microphone" style="cursor: pointer;" title="رسالة صوتية"></i>
+            <i class="fa-solid fa-eye" style="cursor: pointer;" title="صورة للعرض مرة واحدة (View Once)"></i>
+            <i class="fa-solid fa-face-smile" style="cursor: pointer;" title="إيموجيات الآيفون"></i>
+            <input type="text" placeholder="اكتب رسالة...">
+            <i class="fa-solid fa-paper-plane" style="color: var(--accent-red); cursor: pointer;"></i>
+        </div>
+    </div>
+
+    <!-- Settings & Privacy Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <h3>إعدادات البروفايل والخصوصية</h3>
+            <br>
+            <div class="setting-row">
+                <span>إخفاء مؤشر القراءة (Read Receipts):</span>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span>إخفاء جاري الكتابة (...Typing):</span>
+                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+            </div>
+            <div class="setting-row">
+                <span>خط الآيفون الأصلي (SF Pro):</span>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <br>
+            <button class="btn-btn" onclick="closeModal('settingsModal')" style="width: 100%;">حفظ وإغلاق</button>
+        </div>
+    </div>
+
+    <!-- Mini Game Modal (X-O) -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content" style="text-align: center;">
+            <h3>لعبة إكس-أو (Tic-Tac-Toe)</h3>
+            <div class="ttt-grid">
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+                <div class="ttt-cell" onclick="playTTT(this)"></div>
+            </div>
+            <button class="btn-btn" onclick="closeModal('gameModal')">إغلاق اللعبة</button>
+        </div>
+    </div>
+
+    <!-- Interactive Drawing Modal -->
+    <div class="modal" id="drawModal">
+        <div class="modal-content" style="text-align: center;">
+            <h3>لوحة الرسم التفاعلية</h3>
+            <canvas id="paintCanvas" width="350" height="200" style="background: white; border-radius: 8px; margin: 15px 0; cursor: crosshair;"></canvas>
+            <br>
+            <button class="btn-btn" onclick="closeModal('drawModal')">إرسال الرسمة للدردشة</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Tic-Tac-Toe Logic
+        let currentPlayer = 'X';
+        function playTTT(cell) {
+            if (!cell.innerText) {
+                cell.innerText = currentPlayer;
+                cell.style.color = currentPlayer === 'X' ? '#8b0000' : '#4ba3e3';
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            }
+        }
+
+        // Service Worker for PWA Installation
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
 </body>
 </html>

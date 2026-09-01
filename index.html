@@ -3,218 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VampEra - Full App</title>
-    
-    <!-- خط الآيفون SF Pro وأيقونات FontAwesome -->
-    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/sf-pro-display">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- ملف الـ PWA لتثبيت التطبيق -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon.png">
-
+    <title>Vampera - تطبيق الدردشة الذكي</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-main: #12151e;
-            --bg-card: #1a1e29;
-            --bg-element: #222736;
-            --accent-red: #8b0000;
-            --accent-hover: #a00000;
-            --text-white: #ffffff;
-            --text-sub: #a0a5b5;
-            --border-color: #2e3446;
-            --font-ios: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-ios); }
-        body { background-color: var(--bg-main); color: var(--text-white); height: 100vh; display: flex; overflow: hidden; }
-
-        /* Sidebar Navigation */
-        .sidebar { width: 250px; background-color: var(--bg-card); border-left: 1px solid var(--border-color); display: flex; flex-direction: column; padding: 20px 10px; }
-        .logo { font-size: 26px; font-weight: bold; color: var(--accent-red); text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
-        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .nav-item { padding: 12px 15px; border-radius: 10px; color: var(--text-sub); display: flex; align-items: center; gap: 12px; cursor: pointer; transition: 0.3s; }
-        .nav-item:hover, .nav-item.active { background-color: var(--accent-red); color: var(--text-white); }
-
-        /* Center Main Feed */
-        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; border-left: 1px solid var(--border-color); }
-        .header-bar { padding: 15px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-
-        /* Stories & Notes */
-        .stories-container { display: flex; gap: 12px; padding: 15px 20px; background-color: var(--bg-card); border-bottom: 1px solid var(--border-color); overflow-x: auto; }
-        .story-card { min-width: 85px; height: 110px; border-radius: 12px; background-color: var(--bg-element); border: 2px solid var(--accent-red); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; text-align: center; }
-
-        /* Feed & Create Post */
-        .feed-section { padding: 20px; max-width: 650px; margin: 0 auto; width: 100%; }
-        .create-post { background-color: var(--bg-card); padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border-color); }
-        .create-post textarea { width: 100%; background: transparent; border: none; color: var(--text-white); resize: none; outline: none; font-size: 14px; margin-bottom: 10px; }
-        .post-actions { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color); padding-top: 10px; }
-
-        /* Right Panel: Chat & Mini Games & Call Overlay */
-        .right-panel { width: 380px; background-color: var(--bg-card); display: flex; flex-direction: column; }
-        .chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .message { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 13px; position: relative; }
-        .message.sent { background-color: var(--accent-red); align-self: flex-start; }
-        .message.received { background-color: var(--bg-element); align-self: flex-end; }
-        .chat-input-bar { padding: 10px; background-color: var(--bg-element); display: flex; align-items: center; gap: 10px; }
-        .chat-input-bar input { flex: 1; background: transparent; border: none; outline: none; color: var(--text-white); }
-
-        /* Modals (Settings / Games / Drawing) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-content { background: var(--bg-card); padding: 25px; border-radius: 15px; width: 450px; border: 1px solid var(--border-color); }
-        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-
-        /* Tic-Tac-Toe Game Grid */
-        .ttt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 240px; margin: 15px auto; }
-        .ttt-cell { width: 70px; height: 70px; background: var(--bg-element); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; cursor: pointer; border-radius: 8px; }
-
-        /* Custom Toggle Switch */
-        .switch { position: relative; display: inline-block; width: 44px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 22px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--accent-red); }
-        input:checked + .slider:before { transform: translateX(22px); }
-
-        .btn-btn { background-color: var(--accent-red); color: white; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; }
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        body { font-family: 'Cairo', sans-serif; }
     </style>
 </head>
-<body>
+<body id="bodyTheme" class="bg-slate-950 text-slate-100 h-screen flex flex-col overflow-hidden">
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="logo">VampEra</div>
-        <ul class="nav-menu">
-            <li class="nav-item active"><i class="fa-solid fa-house"></i> الرئيسية</li>
-            <li class="nav-item"><i class="fa-solid fa-comments"></i> الدردشة</li>
-            <li class="nav-item" onclick="openModal('gameModal')"><i class="fa-solid fa-gamepad"></i> الألعاب (X-O)</li>
-            <li class="nav-item" onclick="openModal('drawModal')"><i class="fa-solid fa-paint-brush"></i> الرسم التفاعلي</li>
-            <li class="nav-item" onclick="openModal('settingsModal')"><i class="fa-solid fa-gear"></i> إعدادات الخصوصية</li>
-        </ul>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginScreen" class="fixed inset-0 bg-slate-950 flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-900 border border-red-900/40 p-8 rounded-2xl w-full max-w-md shadow-2xl text-center">
+            <h1 class="text-3xl font-bold text-red-500 mb-2">Vampera 🧛‍♂️</h1>
+            <p class="text-slate-400 mb-6">أدخل اسمك للانضمام إلى عالم الدردشة والمتعة</p>
+            <input type="text" id="usernameInput" placeholder="اكتب اسم المستعار هنا..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 mb-4 text-white focus:outline-none focus:border-red-500">
+            <button onclick="login()" class="w-full bg-red-600 hover:bg-red-700 font-bold py-3 rounded-xl transition duration-200">دخول إلى التطبيق</button>
+        </div>
     </div>
 
-    <!-- Main Feed Content -->
-    <div class="main-content">
-        <div class="header-bar">
-            <h2>المنشورات والقصص</h2>
-            <i class="fa-solid fa-bell" style="cursor:pointer;"></i>
-        </div>
+    <!-- التطبيق الرئيسي -->
+    <div id="appScreen" class="hidden flex-1 flex flex-col h-full">
+        <!-- شريط علوي -->
+        <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <span class="text-xl font-bold text-red-500">Vampera</span>
+                <span id="currentRoomTitle" class="text-xs bg-red-950 text-red-300 px-2.5 py-1 rounded-full border border-red-900">الدردشة العامة</span>
+            </div>
+            
+            <!-- أزرار التنقل والثيمات -->
+            <div class="flex items-center gap-2">
+                <button onclick="switchTab('chat')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg">💬 الشات</button>
+                <button onclick="switchTab('ai')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg">🤖 بوت AI</button>
+                <button onclick="switchTab('game')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-sm rounded-lg">🎮 لعبة</button>
+                
+                <!-- تبديل الثيم -->
+                <select onchange="changeTheme(this.value)" class="bg-slate-800 text-xs px-2 py-1.5 rounded-lg border border-slate-700 focus:outline-none">
+                    <option value="red">🧛‍♂️ فامبير (أحمر)</option>
+                    <option value="purple">🔮 ليلكي فخم</option>
+                    <option value="blue">⚡ أزرق نيون</option>
+                </select>
+            </div>
+        </header>
 
-        <!-- Stories & Notes -->
-        <div class="stories-container">
-            <div class="story-card">+ قصة جديدة</div>
-            <div class="story-card">قصة صديق</div>
-            <div class="story-card">ملاحظة سريعة</div>
-        </div>
-
-        <!-- Posts Feed -->
-        <div class="feed-section">
-            <div class="create-post">
-                <textarea placeholder="شاركونا أفكاركم، صوركم، أو ملاحظاتكم اليوم..."></textarea>
-                <div class="post-actions">
-                    <div>
-                        <i class="fa-solid fa-image" style="cursor:pointer; margin-left: 10px;"></i>
-                        <i class="fa-solid fa-video" style="cursor:pointer; margin-left: 10px;"></i>
-                        <i class="fa-solid fa-music" style="cursor:pointer; margin-left: 10px;"></i>
-                    </div>
-                    <button class="btn-btn">نشر المنشور</button>
+        <!-- محتوى التطبيق -->
+        <main class="flex-1 overflow-y-auto p-4 flex flex-col">
+            
+            <!-- قسم الشات العام -->
+            <div id="tab-chat" class="flex-1 flex flex-col h-full">
+                <div id="chatMessages" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-2">
+                    <!-- الرسائل تظهر هنا -->
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" onkeypress="handleKey(event, 'chat')" placeholder="اكتب رسالة..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <button onclick="sendChatMessage()" class="bg-red-600 hover:bg-red-700 px-5 rounded-xl font-bold text-sm">إرسال</button>
                 </div>
             </div>
-        </div>
+
+            <!-- قسم بوت الـ AI -->
+            <div id="tab-ai" class="hidden flex-1 flex flex-col h-full">
+                <div id="aiMessages" class="flex-1 overflow-y-auto space-y-3 mb-4 pr-2">
+                    <div class="bg-slate-900 p-3 rounded-xl max-w-[80%] border border-slate-800">
+                        <span class="text-xs text-red-400 block font-bold mb-1">🤖 Vampera AI</span>
+                        أهلاً بك! أنا بوت الذكاء الاصطناعي الخاص بك، اسألني ما شئت لنملأ وقت الفراغ!
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="aiInput" onkeypress="handleKey(event, 'ai')" placeholder="دردش مع البوت..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-red-500">
+                    <button onclick="sendAIMessage()" class="bg-red-600 hover:bg-red-700 px-5 rounded-xl font-bold text-sm">إرسال</button>
+                </div>
+            </div>
+
+            <!-- قسم الألعاب (لعبة تخمين الرقم) -->
+            <div id="tab-game" class="hidden flex-1 flex flex-col items-center justify-center text-center p-4">
+                <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 max-w-sm w-full shadow-xl">
+                    <h2 class="text-xl font-bold text-red-500 mb-2">🎮 لعبة تخمين الرقم</h2>
+                    <p class="text-sm text-slate-400 mb-4">لقد اخترت رقماً بين 1 و 10. حاول تخمينه!</p>
+                    <input type="number" id="gameGuess" min="1" max="10" placeholder="أدخل رقماً..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 mb-3 text-center text-white focus:outline-none">
+                    <button onclick="checkGame()" class="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-bold text-sm mb-3">تحقق من الإجابة</button>
+                    <p id="gameResult" class="text-sm font-semibold text-slate-300"></p>
+                </div>
+            </div>
+
+        </main>
     </div>
 
-    <!-- Right Panel (Chat & Calls) -->
-    <div class="right-panel">
-        <div class="header-bar">
-            <span>غرفة الدردشة العادية</span>
-            <div>
-                <i class="fa-solid fa-phone" style="margin-left: 10px; cursor: pointer;" title="مكالمة صوتية"></i>
-                <i class="fa-solid fa-desktop" style="cursor: pointer;" title="مشاركة الشاشة"></i>
-            </div>
-        </div>
-
-        <div class="chat-box">
-            <div class="message received">أهلاً بك في منصة VampEra المتكاملة!</div>
-            <div class="message sent">مرحباً! الرسائل والخصوصية شغالة ممتاز.</div>
-        </div>
-
-        <div class="chat-input-bar">
-            <i class="fa-solid fa-microphone" style="cursor: pointer;" title="رسالة صوتية"></i>
-            <i class="fa-solid fa-eye" style="cursor: pointer;" title="صورة للعرض مرة واحدة (View Once)"></i>
-            <i class="fa-solid fa-face-smile" style="cursor: pointer;" title="إيموجيات الآيفون"></i>
-            <input type="text" placeholder="اكتب رسالة...">
-            <i class="fa-solid fa-paper-plane" style="color: var(--accent-red); cursor: pointer;"></i>
-        </div>
-    </div>
-
-    <!-- Settings & Privacy Modal -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <h3>إعدادات البروفايل والخصوصية</h3>
-            <br>
-            <div class="setting-row">
-                <span>إخفاء مؤشر القراءة (Read Receipts):</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>إخفاء جاري الكتابة (...Typing):</span>
-                <label class="switch"><input type="checkbox"><span class="slider"></span></label>
-            </div>
-            <div class="setting-row">
-                <span>خط الآيفون الأصلي (SF Pro):</span>
-                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
-            </div>
-            <br>
-            <button class="btn-btn" onclick="closeModal('settingsModal')" style="width: 100%;">حفظ وإغلاق</button>
-        </div>
-    </div>
-
-    <!-- Mini Game Modal (X-O) -->
-    <div class="modal" id="gameModal">
-        <div class="modal-content" style="text-align: center;">
-            <h3>لعبة إكس-أو (Tic-Tac-Toe)</h3>
-            <div class="ttt-grid">
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-                <div class="ttt-cell" onclick="playTTT(this)"></div>
-            </div>
-            <button class="btn-btn" onclick="closeModal('gameModal')">إغلاق اللعبة</button>
-        </div>
-    </div>
-
-    <!-- Interactive Drawing Modal -->
-    <div class="modal" id="drawModal">
-        <div class="modal-content" style="text-align: center;">
-            <h3>لوحة الرسم التفاعلية</h3>
-            <canvas id="paintCanvas" width="350" height="200" style="background: white; border-radius: 8px; margin: 15px 0; cursor: crosshair;"></canvas>
-            <br>
-            <button class="btn-btn" onclick="closeModal('drawModal')">إرسال الرسمة للدردشة</button>
-        </div>
-    </div>
-
+    <!-- كود الجافاسكريبت لتشغيل كل الوظائف -->
     <script>
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        let currentUser = "";
+        let secretNum = Math.floor(Math.random() * 10) + 1;
 
-        // Tic-Tac-Toe Logic
-        let currentPlayer = 'X';
-        function playTTT(cell) {
-            if (!cell.innerText) {
-                cell.innerText = currentPlayer;
-                cell.style.color = currentPlayer === 'X' ? '#8b0000' : '#4ba3e3';
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        function login() {
+            const input = document.getElementById("usernameInput").value.trim();
+            if(!input) {
+                alert("الرجاء كتابة اسم صالح!");
+                return;
+            }
+            currentUser = input;
+            document.getElementById("loginScreen").classList.add("hidden");
+            document.getElementById("appScreen").classList.remove("hidden");
+            loadMessages();
+        }
+
+        function switchTab(tabName) {
+            document.getElementById("tab-chat").classList.add("hidden");
+            document.getElementById("tab-ai").classList.add("hidden");
+            document.getElementById("tab-game").classList.add("hidden");
+            document.getElementById("tab-" + tabName).classList.remove("hidden");
+        }
+
+        // ثيمات الألوان
+        function changeTheme(theme) {
+            const body = document.getElementById("bodyTheme");
+            if(theme === 'red') body.className = "bg-slate-950 text-slate-100 h-screen flex flex-col overflow-hidden";
+            if(theme === 'purple') body.className = "bg-purple-950 text-purple-100 h-screen flex flex-col overflow-hidden";
+            if(theme === 'blue') body.className = "bg-blue-950 text-blue-100 h-screen flex flex-col overflow-hidden";
+        }
+
+        // إدارة الشات العام
+        function loadMessages() {
+            const msgs = JSON.parse(localStorage.getItem("vampera_msgs") || "[]");
+            const container = document.getElementById("chatMessages");
+            container.innerHTML = "";
+            msgs.forEach(m => {
+                container.innerHTML += `<div class="bg-slate-900 p-3 rounded-xl max-w-[80%] border border-slate-800"><span class="text-xs text-red-400 block font-bold mb-1">${m.user}</span>${m.text}</div>`;
+            });
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById("chatInput");
+            const text = input.value.trim();
+            if(!text) return;
+
+            let msgs = JSON.parse(localStorage.getItem("vampera_msgs") || "[]");
+            msgs.push({ user: currentUser, text: text });
+            localStorage.setItem("vampera_msgs", JSON.stringify(msgs));
+            input.value = "";
+            loadMessages();
+        }
+
+        // بوت الذكاء الاصطناعي التجريبي
+        function sendAIMessage() {
+            const input = document.getElementById("aiInput");
+            const text = input.value.trim();
+            if(!text) return;
+
+            const container = document.getElementById("aiMessages");
+            container.innerHTML += `<div class="bg-slate-800 p-3 rounded-xl max-w-[80%] ml-auto text-left"><span class="text-xs text-blue-400 block font-bold mb-1">أنت</span>${text}</div>`;
+            input.value = "";
+
+            setTimeout(() => {
+                const replies = [
+                    "فكرة ممتازة! واصل العمل عليها.",
+                    "ههه حقاً؟ أخبرني بالمزيد.",
+                    "أنا هنا دائماً لكي لا تحس بالملل!",
+                    "هذا رائع يا صديقي، هل جربت اللعبة في القسم الآخر؟"
+                ];
+                const reply = replies[Math.floor(Math.random() * replies.length)];
+                container.innerHTML += `<div class="bg-slate-900 p-3 rounded-xl max-w-[80%] border border-slate-800"><span class="text-xs text-red-400 block font-bold mb-1">🤖 Vampera AI</span>${reply}</div>`;
+                container.scrollTop = container.scrollHeight;
+            }, 600);
+        }
+
+        // لعبة تخمين الرقم
+        function checkGame() {
+            const guess = parseInt(document.getElementById("gameGuess").value);
+            const res = document.getElementById("gameResult");
+            if(guess === secretNum) {
+                res.className = "text-sm font-semibold text-green-400";
+                res.innerHTML = "🎉 مبروك! لقد خمنت الرقم الصحيح بنجاح!";
+                secretNum = Math.floor(Math.random() * 10) + 1; // إعادة توليد رقم جديد
+            } else if(guess > secretNum) {
+                res.className = "text-sm font-semibold text-yellow-400";
+                res.innerHTML = "📉 الرقم أصغر من هذا، حاول مرة أخرى!";
+            } else {
+                res.className = "text-sm font-semibold text-yellow-400";
+                res.innerHTML = "📈 الرقم أكبر من هذا، حاول مرة أخرى!";
             }
         }
 
-        // Service Worker for PWA Installation
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+        function handleKey(e, type) {
+            if(e.key === 'Enter') {
+                if(type === 'chat') sendChatMessage();
+                if(type === 'ai') sendAIMessage();
+            }
         }
     </script>
 </body>

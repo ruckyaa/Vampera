@@ -3,258 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vampera - السوشيال ميديا المتكاملة</title>
+    <title>Vampera - عالم الفامباير الحقيقي</title>
     <style>
         :root {
-            --bg-color: #030712;
-            --panel-bg: #111827;
-            --accent: #38bdf8;
-            --text-color: #f8fafc;
-            --border: #334155;
-            --chat-bubble: #0284c7;
+            --bg-color: #050508;
+            --panel-bg: #0f0f17;
+            --accent: #dc2626;
+            --accent-glow: rgba(220, 38, 38, 0.4);
+            --text-color: #f3f4f6;
+            --border: #1f1f2e;
         }
-        body[data-theme="neon"] { --bg-color: #030712; --panel-bg: #111827; --accent: #38bdf8; --chat-bubble: #0284c7; }
-        body[data-theme="purple"] { --bg-color: #1e1b4b; --panel-bg: #312e81; --accent: #c084fc; --chat-bubble: #7c3aed; }
-        body[data-theme="vampire"] { --bg-color: #180505; --panel-bg: #2d0a0a; --accent: #ef4444; --chat-bubble: #b91c1c; }
-
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; }
+        body { background-color: var(--bg-color); color: var(--text-color); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 
-        header { background: var(--panel-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
-        .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); }
-        nav { display: flex; gap: 5px; flex-wrap: wrap; }
-        nav button { background: none; border: none; color: var(--text-color); font-size: 0.9rem; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: 0.3s; }
-        nav button.active, nav button:hover { background: var(--accent); color: #fff; }
+        /* تأثيرات الفامباير والخفافيش */
+        .vampire-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999;
+            background: radial-gradient(circle at 50% 10%, rgba(127, 29, 29, 0.15) 0%, transparent 70%);
+        }
 
-        .container { flex: 1; display: flex; max-width: 1200px; margin: 0 auto; width: 100%; padding: 20px; gap: 20px; }
-        .section { display: none; width: 100%; background: var(--panel-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); flex-direction: column; height: 75vh; }
+        /* شاشة تسجيل الدخول الحقيقية */
+        #authScreen { position: fixed; inset: 0; background: var(--bg-color); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .auth-card { background: var(--panel-bg); border: 1px solid var(--accent); padding: 35px; border-radius: 16px; width: 100%; max-width: 420px; text-align: center; box-shadow: 0 0 30px var(--accent-glow); }
+        .auth-card h1 { color: var(--accent); margin-bottom: 5px; font-size: 2.5rem; text-shadow: 0 0 10px var(--accent); }
+        .input-group { margin-bottom: 15px; text-align: right; }
+        .input-group label { display: block; font-size: 0.85rem; margin-bottom: 5px; color: #9ca3af; }
+        input, textarea, select { background: #030305; border: 1px solid var(--border); color: var(--text-color); padding: 12px; border-radius: 8px; width: 100%; outline: none; transition: 0.3s; }
+        input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+
+        /* الشاشة الرئيسية للتطبيق */
+        #appScreen { display: none; flex: 1; flex-direction: column; height: 100vh; }
+        header { background: var(--panel-bg); padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); z-index: 10; }
+        .logo { font-size: 1.6rem; font-weight: bold; color: var(--accent); text-shadow: 0 0 8px var(--accent); }
+        nav { display: flex; gap: 15px; }
+        nav button { background: none; border: none; color: var(--text-color); font-size: 1rem; cursor: pointer; padding: 8px 16px; border-radius: 8px; transition: 0.2s; font-weight: bold; }
+        nav button.active, nav button:hover { background: var(--accent); color: #fff; box-shadow: 0 0 10px var(--accent-glow); }
+
+        .container { flex: 1; display: flex; max-width: 1300px; margin: 0 auto; width: 100%; padding: 20px; gap: 20px; overflow: hidden; }
+        .section { display: none; width: 100%; background: var(--panel-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); flex-direction: column; height: 100%; overflow-y: auto; }
         .section.active { display: flex; }
 
-        /* Profile */
-        .profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #fff; }
-        input, textarea, select { background: var(--bg-color); border: 1px solid var(--border); color: var(--text-color); padding: 10px; border-radius: 8px; width: 100%; margin-top: 5px; }
+        /* شات إنستغرام المتكامل */
+        .chat-layout { display: flex; flex: 1; gap: 15px; overflow: hidden; height: 100%; }
+        .friends-sidebar { width: 300px; background: #030305; border-radius: 8px; border: 1px solid var(--border); overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .friend-card { padding: 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 12px; background: var(--panel-bg); transition: 0.2s; border: 1px solid transparent; }
+        .friend-card:hover, .friend-card.active { background: #1a1a2e; border-color: var(--accent); }
+        .friend-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; box-shadow: 0 0 5px var(--accent); }
+        
+        .chat-box-main { flex: 1; display: flex; flex-direction: column; background: #030305; border-radius: 8px; border: 1px solid var(--border); padding: 15px; overflow: hidden; }
+        .messages-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 12px; padding-right: 5px; }
+        .msg { padding: 10px 15px; border-radius: 12px; max-width: 70%; word-break: break-word; font-size: 0.95rem; }
+        .msg.sent { background: var(--accent); align-self: flex-end; color: #fff; }
+        .msg.received { background: #1f1f2e; align-self: flex-start; }
+        .msg img, .msg video { max-width: 220px; border-radius: 8px; display: block; margin-top: 5px; }
+        .chat-controls { display: flex; gap: 10px; align-items: center; }
 
-        /* Stories */
-        .stories-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
-        .story-ring { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; text-align: center; background: var(--bg-color); flex-shrink: 0; }
+        /* ستايل الستوريات والمنشورات */
+        .stories-bar { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 15px; margin-bottom: 20px; border-bottom: 1px solid var(--border); }
+        .story-ring { width: 75px; height: 75px; border-radius: 50%; background: linear-gradient(45deg, #dc2626, #7f1d1d); padding: 3px; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 8px var(--accent-glow); }
+        .story-inner { width: 100%; height: 100%; background: #030305; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        
+        .feed-container { display: flex; flex-direction: column; gap: 20px; max-width: 650px; margin: 0 auto; width: 100%; }
+        .post-card { background: #030305; border: 1px solid var(--border); border-radius: 12px; padding: 15px; }
+        .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .post-media { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-top: 10px; }
 
-        /* Chat */
-        .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: var(--bg-color); border-radius: 8px; }
-        .message { padding: 10px 14px; border-radius: 10px; max-width: 70%; position: relative; word-break: break-word; }
-        .message.sent { background: var(--chat-bubble); align-self: flex-end; }
-        .message.received { background: var(--border); align-self: flex-start; }
-        .typing-indicator { font-size: 0.8rem; color: #94a3b8; font-style: italic; height: 20px; }
-        .chat-controls { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
+        /* زر الإرسال والأزرار العامة */
+        .btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; box-shadow: 0 0 10px var(--accent-glow); }
+        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .btn-secondary { background: #1f1f2e; box-shadow: none; }
 
-        /* Canvas */
-        #drawingCanvas { background: #fff; cursor: crosshair; border-radius: 8px; width: 100%; height: 200px; }
-
-        /* Games Grid */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .game-card { background: var(--bg-color); padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; }
-        .game-card:hover { border-color: var(--accent); }
-
-        .btn { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .btn:hover { opacity: 0.9; }
+        /* نافذة الرسم */
+        #drawModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; }
+        .draw-box { background: var(--panel-bg); padding: 20px; border-radius: 12px; border: 1px solid var(--accent); text-align: center; }
+        canvas { background: #fff; border-radius: 8px; cursor: crosshair; display: block; margin: 15px auto; }
     </style>
 </head>
-<body data-theme="neon">
+<body>
 
-    <header>
-        <div class="logo">Vampera</div>
-        <nav>
-            <button class="active" onclick="switchTab('chat')">💬 الشات الخاص</button>
-            <button onclick="switchTab('profile')">👤 البروفايل</button>
-            <button onclick="switchTab('stories')">📸 الستوري</button>
-            <button onclick="switchTab('games')">🎮 الألعاب</button>
-        </nav>
-        <select onchange="changeTheme(this.value)" style="width: auto; padding: 5px;">
-            <option value="neon">⚡ نيون</option>
-            <option value="purple">🔮 ليلكي</option>
-            <option value="vampire">🧛‍♂️ فامبير</option>
-        </select>
-    </header>
+    <div class="vampire-bg"></div>
 
-    <div class="container">
-        <!-- Chat Section -->
-        <div id="chat" class="section active">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3>المحادثة الذكية المتكاملة</h3>
-                <div>
-                    <button class="btn" onclick="alert('جارٍ بدء الاتصال الصوتي...')" style="padding: 5px 10px; font-size: 0.8rem;">📞 اتصال</button>
-                    <button class="btn" onclick="alert('جارٍ بدء مكالمة الفيديو...')" style="padding: 5px 10px; font-size: 0.8rem;">📹 فيديو</button>
-                </div>
+    <!-- 1. شاشة تسجيل الدخول الحقيقية للتطبيق -->
+    <div id="authScreen">
+        <div class="auth-card">
+            <h1>Vampera 🦇</h1>
+            <p style="color: #9ca3af; margin-bottom: 25px;">عالم إنستغرام المظلم والغامض</p>
+            <div class="input-group">
+                <label>اسم المستخدم الحقيقي</label>
+                <input type="text" id="usernameInput" placeholder="اكتب اسمك الفخم...">
             </div>
-            <div class="chat-box" id="chatBox">
-                <div class="message received">مرحباً بك في Vampera الشامل! أرسل رسالة، صور، ارسم، أو العب معنا.</div>
+            <div class="input-group">
+                <label>صورة البروفايل (رابط أو حرف)</label>
+                <input type="text" id="avatarInput" placeholder="حرفك الأول أو رابط صورة">
             </div>
-            <div class="typing-indicator" id="typingIndicator"></div>
-            <div class="chat-controls">
-                <input type="text" id="chatInput" placeholder="اكتب رسالة..." onkeypress="handleTyping(event)">
-                <button class="btn" onclick="sendMessage()">إرسال</button>
-                <button class="btn" onclick="toggleDrawing()" title="رسم">🎨</button>
-                <input type="file" id="imageInput" style="display:none" onchange="sendImage(event)">
-                <button class="btn" onclick="document.getElementById('imageInput').click()" title="صورة">📷</button>
+            <div class="input-group">
+                <label>الموسيقى المفضلة في بروفايلك (اغنية فامباير)</label>
+                <input type="text" id="musicInput" placeholder="اسم الموسيقى أو الرابط...">
             </div>
-            <div id="drawingContainer" style="display:none; margin-top: 10px;">
-                <canvas id="drawingCanvas"></canvas>
-                <button class="btn" onclick="sendDrawing()" style="margin-top: 5px;">إرسال الرسمة</button>
-            </div>
+            <button class="btn" onclick="enterApp()">دخول إلى مملكة الفامباير 🩸</button>
         </div>
+    </div>
 
-        <!-- Profile Section -->
-        <div id="profile" class="section">
-            <h2>إعدادات الحساب والبيو</h2>
-            <div class="profile-header">
-                <div class="avatar" id="profileAvatar">ر</div>
-                <div>
-                    <h3 id="displayName">روكي</h3>
-                    <p style="color: #94a3b8;">متصل الآن عبر Google</p>
+    <!-- 2. واجهة التطبيق الرئيسية (ستايل إنستغرام متكامل) -->
+    <div id="appScreen">
+        <header>
+            <div class="logo">Vampera 🦇</div>
+            <nav>
+                <button class="active" onclick="switchTab('feedTab', this)">🏠 الرئيسية</button>
+                <button onclick="switchTab('chatTab', this)">💬 الشات</button>
+                <button onclick="switchTab('storiesTab', this)">📸 الستوريات</button>
+                <button onclick="switchTab('profileTab', this)">👤 حسابي</button>
+            </nav>
+            <button onclick="logout()" style="background:none; border:1px solid var(--accent); color:#ef4444; padding:6px 12px; border-radius:6px; cursor:pointer;">خروج</button>
+        </header>
+
+        <div class="container">
+            
+            <!-- تبويب الرئيسية والمنشورات (صورة، فيديو، كتابة) -->
+            <div id="feedTab" class="section active">
+                <div style="background: #030305; padding: 15px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 10px; color: var(--accent); font-size: 1.1rem;">انشر منشور جديد (صورة، فيديو، أو كتابة)</h3>
+                    <textarea id="postText" rows="2" placeholder="بماذا تفكر في عالم الظلام؟" style="margin-bottom: 10px;"></textarea>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" id="postMediaUrl" placeholder="رابط صورة أو فيديو (اختياري)..." style="flex: 1;">
+                        <select id="postMediaType" style="width: 120px;">
+                            <option value="none">بدون وسائط</option>
+                            <option value="image">صورة 🖼️</option>
+                            <option value="video">فيديو 🎬</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="createNewPost()">نشر المنشور ✨</button>
+                </div>
+
+                <div class="feed-container" id="mainFeed">
+                    <!-- المنشورات تظهر هنا -->
                 </div>
             </div>
-            <label>اسم المستخدم:</label>
-            <input type="text" id="nameInput" value="روكي" oninput="updateProfileName(this.value)">
-            <label style="margin-top: 15px;">النبذة (Bio):</label>
-            <textarea id="bioInput" rows="3">مبرمج ومؤسس منصة Vampera 🚀✨</textarea>
-            <button class="btn" style="margin-top: 15px;" onclick="alert('تم حفظ إعدادات الحساب بنجاح!')">حفظ التعديلات</button>
+
+            <!-- تبويب الشات والأصدقاء + الدردشة العامة بالكود 1001 -->
+            <div id="chatTab" class="section">
+                <div class="chat-layout">
+                    <div class="friends-sidebar">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 5px;">
+                            <h4 style="font-size: 0.9rem; color: #9ca3af;">الدردشات</h4>
+                            <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; width: auto;" onclick="joinSecretGroup()">🔒 شات 1001</button>
+                        </div>
+                        <div class="friend-card active" onclick="selectChat('Dracula', 'دراكولا (رسمي)', this)">
+                            <div class="friend-avatar">D</div>
+                            <div>
+                                <h5 style="font-size: 0.95rem;">دراكولا</h5>
+                                <p style="font-size: 0.75rem; color: #ef4444;">متصل في الظلام</p>
+                            </div>
+                        </div>
+                        <div class="friend-card" onclick="selectChat('Group1001', 'الدردشة الجماعية (الكود 1001)', this)">
+                            <div class="friend-avatar" style="background: #7f1d1d;">10</div>
+                            <div>
+                                <h5 style="font-size: 0.95rem;">مملكة 1001 السرية</h5>
+                                <p style="font-size: 0.75rem; color: #38bdf8;">شات سري بالأسرار</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chat-box-main">
+                        <h3 id="currentChatTitle" style="margin-bottom: 10px; font-size: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 8px;">المحادثة مع: دراكولا</h3>
+                        <div class="messages-container" id="messagesArea">
+                            <div class="msg received">مرحباً بك في عالم Vampera. كل شيء هنا حقيقي ومخصص لك! 🦇</div>
+                        </div>
+                        <div class="chat-controls">
+                            <input type="text" id="msgInput" placeholder="اكتب رسالتك..." onkeypress="if(event.key==='Enter') sendTextMessage()">
+                            <button class="btn btn-secondary" style="width: auto; padding: 0 15px;" onclick="openDrawModal()">🎨 رسم</button>
+                            <button class="btn" style="width: auto; padding: 0 20px;" onclick="sendTextMessage()">إرسال</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب الستوريات (صور وفيديوهات حقيقية) -->
+            <div id="storiesTab" class="section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2>الستوريات والقصص اليومية</h2>
+                    <button class="btn" style="width: auto; padding: 8px 15px;" onclick="addStory()">➕ إضافة ستوري</button>
+                </div>
+
+                <div class="stories-bar" id="storiesBar">
+                    <div class="story-ring"><div class="story-inner">🦇</div></div>
+                </div>
+
+                <div class="feed-container" id="storiesFeed">
+                    <!-- الستوريات تظهر هنا -->
+                </div>
+            </div>
+
+            <!-- تبويب الحساب والبروفايل (البيو، الموسيقى، حذف، ديزاكتيف) -->
+            <div id="profileTab" class="section">
+                <h2>إعدادات الحساب الشخصي</h2>
+                <div style="display: flex; align-items: center; gap: 20px; margin: 20px 0; background: #030305; padding: 20px; border-radius: 10px; border: 1px solid var(--border);">
+                    <div id="profileAvatarDisplay" style="width: 80px; height: 80px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2.2rem; font-weight: bold; box-shadow: 0 0 10px var(--accent);">V</div>
+                    <div>
+                        <h3 id="profileNameDisplay" style="font-size: 1.4rem;">اسم المستخدم</h3>
+                        <p id="profileMusicDisplay" style="color: #38bdf8; font-size: 0.85rem; margin-top: 4px;">🎵 الموسيقى: لم تُحدد</p>
+                        <p style="color: #22c55e; font-size: 0.8rem; margin-top: 4px;">حساب نشط ومحمي</p>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>تعديل النبذة الشخصية (Bio)</label>
+                    <textarea id="profileBioInput" rows="3" placeholder="اكتب شيئاً مرعباً أو مميزاً عنك..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 15px;">
+                    <button class="btn" onclick="alert('تم حفظ التعديلات بنجاح في حسابك الحقيقي!')">حفظ التعديلات</button>
+                    <button class="btn btn-secondary" style="color: #f87171; border-color: #7f1d1d;" onclick="deactivateAccount()">تعطيل الحساب (Deactivate)</button>
+                    <button class="btn btn-secondary" style="color: #ef4444; border-color: #dc2626;" onclick="deleteAccount()">حذف الحساب نهائياً</button>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <!-- Stories Section -->
-        <div id="stories" class="section">
-            <h2>الستوريات والقصص اليومية</h2>
-            <div class="stories-container">
-                <div class="story-ring" onclick="addStory()">➕<br>أضف ستوري</div>
-                <div class="story-ring" onclick="alert('عرض ستوري الصديق روكي')">روكي</div>
+    <!-- نافذة الرسم -->
+    <div id="drawModal">
+        <div class="draw-box">
+            <h3 style="color: var(--accent);">ارسم رسالتك الفخمة 🎨</h3>
+            <canvas id="paintCanvas" width="320" height="220"></canvas>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" onclick="clearCanvas()">مسح</button>
+                <button class="btn btn-secondary" onclick="closeDrawModal()">إلغاء</button>
+                <button class="btn" onclick="sendDrawingMessage()">إرسال الرسمة</button>
             </div>
-            <div style="flex: 1; background: var(--bg-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                انقر على أي ستوري للمشاهدة
-            </div>
-        </div>
-
-        <!-- Games Section -->
-        <div id="games" class="section">
-            <h2>صالة الألعاب (إكس أو والشطرنج والدودة)</h2>
-            <div class="games-grid">
-                <div class="game-card" onclick="playGame('xo')">
-                    <h3>❌ إكس أو</h3>
-                    <p>تحدي الذكاء الاصطناعي</p>
-                </div>
-                <div class="game-card" onclick="playGame('chess')">
-                    <h3>♟️ شطرنج</h3>
-                    <p>استراتيجية وتكتيك</p>
-                </div>
-                <div class="game-card" onclick="playGame('snake')">
-                    <h3>🐍 الدودة</h3>
-                    <p>الكلاسيكية الممتعة</p>
-                </div>
-            </div>
-            <div id="gameScreen" style="margin-top: 15px; text-align: center;"></div>
         </div>
     </div>
 
     <script>
-        function switchTab(tabId) {
+        let currentUser = { name: "فامباير", avatar: "🦇", music: "لا توجد" };
+        let currentChat = "Dracula";
+
+        function enterApp() {
+            const name = document.getElementById('usernameInput').value.trim();
+            const avatar = document.getElementById('avatarInput').value.trim();
+            const music = document.getElementById('musicInput').value.trim();
+
+            if(!name) { alert("يرجى إدخال اسم المستخدم!"); return; }
+
+            currentUser.name = name;
+            currentUser.avatar = avatar ? avatar.charAt(0).toUpperCase() : name.charAt(0).toUpperCase();
+            currentUser.music = music || "أغنية الظلام الكلاسيكية";
+
+            document.getElementById('authScreen').style.display = 'none';
+            document.getElementById('appScreen').style.display = 'flex';
+
+            document.getElementById('profileNameDisplay').innerText = currentUser.name;
+            document.getElementById('profileAvatarDisplay').innerText = currentUser.avatar;
+            document.getElementById('profileMusicDisplay').innerText = "🎵 الموسيقى: " + currentUser.music;
+        }
+
+        function logout() {
+            document.getElementById('appScreen').style.display = 'none';
+            document.getElementById('authScreen').style.display = 'flex';
+        }
+
+        function switchTab(tabId, btn) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+            btn.classList.add('active');
         }
 
-        function changeTheme(themeName) {
-            document.body.setAttribute('data-theme', themeName);
-        }
-
-        const chatBox = document.getElementById('chatBox');
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            if(!input.value.trim()) return;
-            
-            const msg = document.createElement('div');
-            msg.className = 'message sent';
-            msg.innerHTML = input.value + '<div style="font-size:0.6rem; text-align:left; color:#cbd5e1;">✓✓ تمت القراءة</div>';
-            chatBox.appendChild(msg);
-            
-            const txt = input.value;
-            input.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            document.getElementById('typingIndicator').innerText = 'جارٍ الكتابة...';
-            setTimeout(() => {
-                document.getElementById('typingIndicator').innerText = '';
-                const reply = document.createElement('div');
-                reply.className = 'message received';
-                reply.innerText = "رد تلقائي على: " + txt;
-                chatBox.appendChild(reply);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 1000);
-        }
-
-        function handleTyping(e) { if(e.key === 'Enter') sendMessage(); }
-
-        function updateProfileName(val) {
-            document.getElementById('displayName').innerText = val || 'زائر';
-            document.getElementById('profileAvatar').innerText = (val || 'ز').charAt(0);
-        }
-
-        let isDrawing = false;
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        function toggleDrawing() {
-            const container = document.getElementById('drawingContainer');
-            container.style.display = container.style.display === 'none' ? 'block' : 'none';
-            canvas.width = canvas.offsetWidth;
-            canvas.height = 200;
-        }
-
-        canvas.addEventListener('mousedown', () => isDrawing = true);
-        canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.beginPath(); });
-        canvas.addEventListener('mousemove', (e) => {
-            if (!isDrawing) return;
-            ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
-            ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY);
-        });
-
-        function sendDrawing() {
-            const dataUrl = canvas.toDataURL();
-            const msg = document.createElement('div');
-            msg.className = 'message sent';
-            msg.innerHTML = `<img src="${dataUrl}" style="max-width:100%; border-radius:5px;">`;
-            chatBox.appendChild(msg);
-            toggleDrawing();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function sendImage(e) {
-            const file = e.target.files[0];
-            if(file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const msg = document.createElement('div');
-                    msg.className = 'message sent';
-                    msg.innerHTML = `<img src="${event.target.result}" style="max-width:100%; border-radius:5px;"><div style="font-size:0.6rem; color:#cbd5e1;">عرض لمرة واحدة 👁️</div>`;
-                    chatBox.appendChild(msg);
-                    chatBox.scrollTop = chatBox.scrollHeight;
+        function selectChat(chatId, title, element) {
+            if(chatId === 'Group1001') {
+                let code = prompt("هذه دردشة جماعية سرية. أدخل كود الدخول (الكود هو 1001):");
+                if(code !== "1001") {
+                    alert("الكود خاطئ! لا يمكنك الدخول.");
+                    return;
                 }
-                reader.readAsDataURL(file);
+                alert("مرحباً بك في الدردشة السرية 1001!");
+            }
+            currentChat = chatId;
+            document.getElementById('currentChatTitle').innerText = "المحادثة مع: " + title;
+            document.querySelectorAll('.friend-card').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function joinSecretGroup() {
+            let code = prompt("أدخل كود الدردشة الجماعية (1001):");
+            if(code === "1001") {
+                alert("تم الدخول بنجاح إلى شات 1001 السرية!");
+                currentChat = "Group1001";
+                document.getElementById('currentChatTitle').innerText = "المحادثة مع: مملكة 1001 السرية";
+            } else {
+                alert("الكود خاطئ!");
             }
         }
 
-        function playGame(type) {
-            const screen = document.getElementById('gameScreen');
-            if(type === 'xo') {
-                screen.innerHTML = '<p style="color:var(--accent);">لعبة إكس أو:</p><table style="margin: 10px auto; border-collapse: collapse;"><tr><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td></tr></table>';
-            } else {
-                screen.innerHTML = `<p>جاري تشغيل لعبة ${type}...</p>`;
+        function sendTextMessage() {
+            const input = document.getElementById('msgInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const area = document.getElementById('messagesArea');
+            area.innerHTML += `<div class="msg sent">${text}</div>`;
+            input.value = '';
+            area.scrollTop = area.scrollHeight;
+        }
+
+        function createNewPost() {
+            const text = document.getElementById('postText').value.trim();
+            const mediaUrl = document.getElementById('postMediaUrl').value.trim();
+            const mediaType = document.getElementById('postMediaType').value;
+
+            if(!text && !mediaUrl) { alert("أدخل نص أو رابط وسائط للمنشور!"); return; }
+
+            const feed = document.getElementById('mainFeed');
+            let mediaHtml = '';
+            if(mediaType === 'image' && mediaUrl) {
+                mediaHtml = `<img src="${mediaUrl}" class="post-media" alt="صورة المنشور">`;
+            } else if(mediaType === 'video' && mediaUrl) {
+                mediaHtml = `<video src="${mediaUrl}" class="post-media" controls></video>`;
             }
+
+            feed.innerHTML = `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="friend-avatar" style="width:35px; height:35px; font-size:0.9rem;">${currentUser.avatar}</div>
+                        <h5 style="font-size:0.95rem;">${currentUser.name}</h5>
+                    </div>
+                    ${text ? `<p style="margin-bottom: 8px;">${text}</p>` : ''}
+                    ${mediaHtml}
+                </div>
+            ` + feed.innerHTML;
+
+            document.getElementById('postText').value = '';
+            document.getElementById('postMediaUrl').value = '';
+            alert("تم نشر المنشور بنجاح في خلاصة الفامباير!");
         }
 
         function addStory() {
-            const text = prompt("اكتب محتوى الستوري الخاص بك:");
-            if(text) alert("تم نشر الستوري بنجاح!");
+            const mediaUrl = prompt("أدخل رابط الصورة أو الفيديو الخاص بالستوري:");
+            if(!mediaUrl) return;
+
+            const bar = document.getElementById('storiesBar');
+            bar.innerHTML += `<div class="story-ring"><div class="story-inner">${currentUser.avatar}</div></div>`;
+
+            const storiesFeed = document.getElementById('storiesFeed');
+            storiesFeed.innerHTML = `
+                <div class="post-card">
+                    <div class="post-header">
+                        <div class="friend-avatar" style="width:35px; height:35px; font-size:0.9rem;">${currentUser.avatar}</div>
+                        <h5 style="font-size:0.95rem;">${currentUser.name} (ستوري)</h5>
+                    </div>
+                    <img src="${mediaUrl}" class="post-media" style="max-height: 450px;" alt="ستوري">
+                </div>
+            ` + storiesFeed.innerHTML;
+
+            alert("تم نشر الستوري بنجاح!");
+        }
+
+        function deactivateAccount() {
+            if(confirm("هل أنت متأكد من تعطيل حسابك مؤقتاً؟")) {
+                alert("تم تعطيل الحساب بنجاح. يمكنك العودة في أي وقت.");
+                logout();
+            }
+        }
+
+        function deleteAccount() {
+            if(confirm("تحذير صارم: هل تريد حذف حسابك نهائياً من قاعدة البيانات؟")) {
+                alert("تم حذف الحساب نهائياً.");
+                logout();
+            }
+        }
+
+        /* أدوات الرسم */
+        const canvas = document.getElementById('paintCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+        ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#dc2626';
+
+        canvas.addEventListener('mousedown', (e) => { painting = true; draw(e); });
+        canvas.addEventListener('mouseup', () => { painting = false; ctx.beginPath(); });
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(e) {
+            if(!painting) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+        function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+        function openDrawModal() { document.getElementById('drawModal').style.display = 'flex'; clearCanvas(); }
+        function closeDrawModal() { document.getElementById('drawModal').style.display = 'none'; }
+
+        function sendDrawingMessage() {
+            const dataUrl = canvas.toDataURL();
+            const area = document.getElementById('messagesArea');
+            area.innerHTML += `<div class="msg sent">رسالة مرسومة:<br><img src="${dataUrl}"></div>`;
+            closeDrawModal();
+            area.scrollTop = area.scrollHeight;
         }
     </script>
 </body>

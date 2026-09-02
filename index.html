@@ -6,12 +6,12 @@
     <title>Vampera - السوشيال ميديا المتكاملة</title>
     <style>
         :root {
-            --bg-color: #0f172a;
-            --panel-bg: #1e293b;
-            --accent: #ef4444;
+            --bg-color: #030712;
+            --panel-bg: #111827;
+            --accent: #38bdf8;
             --text-color: #f8fafc;
             --border: #334155;
-            --chat-bubble: #3b82f6;
+            --chat-bubble: #0284c7;
         }
         body[data-theme="neon"] { --bg-color: #030712; --panel-bg: #111827; --accent: #38bdf8; --chat-bubble: #0284c7; }
         body[data-theme="purple"] { --bg-color: #1e1b4b; --panel-bg: #312e81; --accent: #c084fc; --chat-bubble: #7c3aed; }
@@ -22,23 +22,24 @@
 
         header { background: var(--panel-bg); padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
         .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); }
-        nav button { background: none; border: none; color: var(--text-color); font-size: 1rem; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: 0.3s; }
+        nav { display: flex; gap: 5px; flex-wrap: wrap; }
+        nav button { background: none; border: none; color: var(--text-color); font-size: 0.9rem; cursor: pointer; padding: 8px 12px; border-radius: 8px; transition: 0.3s; }
         nav button.active, nav button:hover { background: var(--accent); color: #fff; }
 
         .container { flex: 1; display: flex; max-width: 1200px; margin: 0 auto; width: 100%; padding: 20px; gap: 20px; }
         .section { display: none; width: 100%; background: var(--panel-bg); border-radius: 12px; padding: 20px; border: 1px solid var(--border); flex-direction: column; height: 75vh; }
         .section.active { display: flex; }
 
-        /* Profile Section */
+        /* Profile */
         .profile-header { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; }
-        .avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; }
-        .bio-input, input, textarea { background: var(--bg-color); border: 1px solid var(--border); color: var(--text-color); padding: 10px; border-radius: 8px; width: 100%; margin-top: 5px; }
+        .avatar { width: 90px; height: 90px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: bold; color: #fff; }
+        input, textarea, select { background: var(--bg-color); border: 1px solid var(--border); color: var(--text-color); padding: 10px; border-radius: 8px; width: 100%; margin-top: 5px; }
 
         /* Stories */
         .stories-container { display: flex; gap: 15px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
         .story-ring { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.8rem; text-align: center; background: var(--bg-color); flex-shrink: 0; }
 
-        /* Chat Section */
+        /* Chat */
         .chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px; background: var(--bg-color); border-radius: 8px; }
         .message { padding: 10px 14px; border-radius: 10px; max-width: 70%; position: relative; word-break: break-word; }
         .message.sent { background: var(--chat-bubble); align-self: flex-end; }
@@ -46,11 +47,11 @@
         .typing-indicator { font-size: 0.8rem; color: #94a3b8; font-style: italic; height: 20px; }
         .chat-controls { display: flex; gap: 10px; margin-top: 10px; align-items: center; }
 
-        /* Drawing & Canvas Modal */
-        #drawingCanvas { background: #fff; cursor: crosshair; border-radius: 8px; width: 100%; height: 250px; }
+        /* Canvas */
+        #drawingCanvas { background: #fff; cursor: crosshair; border-radius: 8px; width: 100%; height: 200px; }
 
         /* Games Grid */
-        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         .game-card { background: var(--bg-color); padding: 20px; border-radius: 8px; text-align: center; cursor: pointer; border: 1px solid var(--border); transition: 0.2s; }
         .game-card:hover { border-color: var(--accent); }
 
@@ -63,15 +64,15 @@
     <header>
         <div class="logo">Vampera</div>
         <nav>
-            <button class="active" onclick="switchTab('chat')">💬 الشات</button>
+            <button class="active" onclick="switchTab('chat')">💬 الشات الخاص</button>
             <button onclick="switchTab('profile')">👤 البروفايل</button>
             <button onclick="switchTab('stories')">📸 الستوري</button>
             <button onclick="switchTab('games')">🎮 الألعاب</button>
         </nav>
-        <select onchange="changeTheme(this.value)" style="background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border); padding: 5px; border-radius: 5px;">
-            <option value="neon">⚡ أزرق نيون</option>
-            <option value="purple">🔮 ليلكي فخم</option>
-            <option value="vampire">🧛‍♂️ فامبير أحمر</option>
+        <select onchange="changeTheme(this.value)" style="width: auto; padding: 5px;">
+            <option value="neon">⚡ نيون</option>
+            <option value="purple">🔮 ليلكي</option>
+            <option value="vampire">🧛‍♂️ فامبير</option>
         </select>
     </header>
 
@@ -79,14 +80,14 @@
         <!-- Chat Section -->
         <div id="chat" class="section active">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                <h3>المحادثة الخاصة (بوت فامبي)</h3>
+                <h3>المحادثة الذكية المتكاملة</h3>
                 <div>
-                    <button class="btn" onclick="startCall('voice')" style="padding: 5px 10px; font-size: 0.8rem;">📞 اتصال صوتي</button>
-                    <button class="btn" onclick="startCall('video')" style="padding: 5px 10px; font-size: 0.8rem;">📹 فيديو</button>
+                    <button class="btn" onclick="alert('جارٍ بدء الاتصال الصوتي...')" style="padding: 5px 10px; font-size: 0.8rem;">📞 اتصال</button>
+                    <button class="btn" onclick="alert('جارٍ بدء مكالمة الفيديو...')" style="padding: 5px 10px; font-size: 0.8rem;">📹 فيديو</button>
                 </div>
             </div>
             <div class="chat-box" id="chatBox">
-                <div class="message received">أهلاً بك في شات Vampera المتكامل! كيف يمكنني مساعدتك؟</div>
+                <div class="message received">مرحباً بك في Vampera الشامل! أرسل رسالة، صور، ارسم، أو العب معنا.</div>
             </div>
             <div class="typing-indicator" id="typingIndicator"></div>
             <div class="chat-controls">
@@ -104,47 +105,47 @@
 
         <!-- Profile Section -->
         <div id="profile" class="section">
-            <h2>إعدادات الحساب الشخصي</h2>
+            <h2>إعدادات الحساب والبيو</h2>
             <div class="profile-header">
                 <div class="avatar" id="profileAvatar">ر</div>
                 <div>
                     <h3 id="displayName">روكي</h3>
-                    <p style="color: #94a3b8;">متصل الآن</p>
+                    <p style="color: #94a3b8;">متصل الآن عبر Google</p>
                 </div>
             </div>
             <label>اسم المستخدم:</label>
             <input type="text" id="nameInput" value="روكي" oninput="updateProfileName(this.value)">
-            <label style="margin-top: 15px;">النبذة التعريفية (Bio):</label>
-            <textarea id="bioInput" rows="3" placeholder="اكتب شيئاً عن نفسك...">مبرمج ومطور تطبيقات Vampera الذكية ✨</textarea>
-            <button class="btn" style="margin-top: 15px;" onclick="alert('تم حفظ الإعدادات بنجاح!')">حفظ التعديلات</button>
+            <label style="margin-top: 15px;">النبذة (Bio):</label>
+            <textarea id="bioInput" rows="3">مبرمج ومؤسس منصة Vampera 🚀✨</textarea>
+            <button class="btn" style="margin-top: 15px;" onclick="alert('تم حفظ إعدادات الحساب بنجاح!')">حفظ التعديلات</button>
         </div>
 
         <!-- Stories Section -->
         <div id="stories" class="section">
-            <h2>الستوريات والقصص</h2>
+            <h2>الستوريات والقصص اليومية</h2>
             <div class="stories-container">
                 <div class="story-ring" onclick="addStory()">➕<br>أضف ستوري</div>
                 <div class="story-ring" onclick="alert('عرض ستوري الصديق روكي')">روكي</div>
             </div>
-            <div id="storiesFeed" style="flex: 1; background: var(--bg-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                اختر ستوري للمشاهدة
+            <div style="flex: 1; background: var(--bg-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                انقر على أي ستوري للمشاهدة
             </div>
         </div>
 
         <!-- Games Section -->
         <div id="games" class="section">
-            <h2>صالة الألعاب التفاعلية</h2>
+            <h2>صالة الألعاب (إكس أو والشطرنج والدودة)</h2>
             <div class="games-grid">
                 <div class="game-card" onclick="playGame('xo')">
-                    <h3>❌ إكس أو (XO)</h3>
-                    <p>العب ضد الذكاء الاصطناعي</p>
+                    <h3>❌ إكس أو</h3>
+                    <p>تحدي الذكاء الاصطناعي</p>
                 </div>
                 <div class="game-card" onclick="playGame('chess')">
-                    <h3>♟️ شطرنج مصغر</h3>
-                    <p>اختبر ذكائك الاستراتيجي</p>
+                    <h3>♟️ شطرنج</h3>
+                    <p>استراتيجية وتكتيك</p>
                 </div>
                 <div class="game-card" onclick="playGame('snake')">
-                    <h3>🐍 لعبة الدودة</h3>
+                    <h3>🐍 الدودة</h3>
                     <p>الكلاسيكية الممتعة</p>
                 </div>
             </div>
@@ -164,7 +165,6 @@
             document.body.setAttribute('data-theme', themeName);
         }
 
-        // Chat Logic
         const chatBox = document.getElementById('chatBox');
         function sendMessage() {
             const input = document.getElementById('chatInput');
@@ -179,28 +179,24 @@
             input.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // Bot response simulation
-            document.getElementById('typingIndicator').innerText = 'فامبي يكتب الآن...';
+            document.getElementById('typingIndicator').innerText = 'جارٍ الكتابة...';
             setTimeout(() => {
                 document.getElementById('typingIndicator').innerText = '';
                 const reply = document.createElement('div');
                 reply.className = 'message received';
-                reply.innerText = "أنا جاهز دائماً يا بطل! ردًا على: " + txt;
+                reply.innerText = "رد تلقائي على: " + txt;
                 chatBox.appendChild(reply);
                 chatBox.scrollTop = chatBox.scrollHeight;
             }, 1000);
         }
 
-        function handleTyping(e) {
-            if(e.key === 'Enter') sendMessage();
-        }
+        function handleTyping(e) { if(e.key === 'Enter') sendMessage(); }
 
         function updateProfileName(val) {
             document.getElementById('displayName').innerText = val || 'زائر';
             document.getElementById('profileAvatar').innerText = (val || 'ز').charAt(0);
         }
 
-        // Drawing Canvas logic
         let isDrawing = false;
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
@@ -209,23 +205,17 @@
             const container = document.getElementById('drawingContainer');
             container.style.display = container.style.display === 'none' ? 'block' : 'none';
             canvas.width = canvas.offsetWidth;
-            canvas.height = 250;
+            canvas.height = 200;
         }
 
         canvas.addEventListener('mousedown', () => isDrawing = true);
         canvas.addEventListener('mouseup', () => { isDrawing = false; ctx.beginPath(); });
-        canvas.addEventListener('mousemove', drawOnCanvas);
-
-        function drawOnCanvas(e) {
+        canvas.addEventListener('mousemove', (e) => {
             if (!isDrawing) return;
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#000';
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        }
+            ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
+            ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY);
+        });
 
         function sendDrawing() {
             const dataUrl = canvas.toDataURL();
@@ -253,22 +243,18 @@
             }
         }
 
-        function startCall(type) {
-            alert(`جاري بدء ${type === 'voice' ? 'اتصال صوتي' : 'مكالمة فيديو'} مع الخادم...`);
-        }
-
         function playGame(type) {
             const screen = document.getElementById('gameScreen');
             if(type === 'xo') {
-                screen.innerHTML = '<p style="color:var(--accent);">لعبة إكس أو قيد التشغيل (اختر مربعاً):</p><table style="margin: 10px auto; border-collapse: collapse;"><tr><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td></tr></table>';
+                screen.innerHTML = '<p style="color:var(--accent);">لعبة إكس أو:</p><table style="margin: 10px auto; border-collapse: collapse;"><tr><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td><td style="border:1px solid var(--border); width:40px; height:40px; text-align:center; cursor:pointer;" onclick="this.innerText=\'X\'"></td></tr></table>';
             } else {
-                screen.innerHTML = `<p>جاري تشغيل لعبة ${type} المتطورة قريباً!</p>`;
+                screen.innerHTML = `<p>جاري تشغيل لعبة ${type}...</p>`;
             }
         }
 
         function addStory() {
-            const text = prompt("أدخل محتوى الستوري الجديد:");
-            if(text) alert("تم نشر الستوري بنجاح في ملفك الشخصي!");
+            const text = prompt("اكتب محتوى الستوري الخاص بك:");
+            if(text) alert("تم نشر الستوري بنجاح!");
         }
     </script>
 </body>
